@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>站名志 · 北京地铁全网图</title>
+<meta name="description" content="北京地铁全网线路图，点击任意站点，查看站名由来与趣事。">
+<meta name="theme-color" content="#f4efe2">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='9' fill='%23b23a2b'/%3E%3Ctext x='32' y='46' font-size='38' text-anchor='middle' fill='%23f4efe2' font-family='serif'%3E%E4%BA%AC%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="#" aria-label="站名志首页">
+    <span class="seal" aria-hidden="true">京</span>
+    <span class="brand-text">
+      <b>站名志</b>
+      <small>北京地铁 · 全网图</small>
+    </span>
+  </a>
+
+  <div class="searchbox">
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+      <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M16.5 16.5 L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <input id="search" type="search" placeholder="搜站名，如：北新桥、金台夕照…" autocomplete="off" aria-label="搜索车站">
+    <ul id="suggest" class="suggest" hidden></ul>
+  </div>
+
+  <p class="stat">
+    <b id="curatedStat">87</b><span>个故事</span>
+    <i>/</i>
+    <b id="totalStat">424</b><span>座车站</span>
+  </p>
+</header>
+
+<main class="stage">
+  <div class="canvas" id="canvas">
+    <div class="loading" id="loading">
+      <span class="spinner" aria-hidden="true"></span>
+      <span>全网线路图加载中…</span>
+    </div>
+
+    <svg id="mapSvg" viewBox="0 0 5670 3712" preserveAspectRatio="xMidYMid meet" aria-label="北京地铁全网线路图">
+      <g id="world">
+        <image href="assets/official-map-small.jpg" x="0" y="0" width="5670" height="3712" class="preview" aria-hidden="true"/>
+        <image id="mapImage" x="0" y="0" width="5670" height="3712" class="base" aria-hidden="true"></image>
+        <g id="markers"></g>
+      </g>
+    </svg>
+
+    <div class="map-hint" id="mapHint">
+      <span>双指 / 滚轮缩放</span><i></i><span>拖动平移</span><i></i><span>点站点看故事</span>
+    </div>
+
+    <div class="legend">
+      <span><i class="key gold"></i>有故事</span>
+      <span><i class="key plain"></i>待补充</span>
+      <button id="onlyCurated" type="button" aria-pressed="false">只看有故事</button>
+      <span class="src">底图 © 北京地铁</span>
+    </div>
+
+    <div class="map-controls">
+      <button type="button" id="zoomIn" title="放大" aria-label="放大">+</button>
+      <button type="button" id="zoomOut" title="缩小" aria-label="缩小">−</button>
+      <button type="button" id="zoomReset" title="回到全图" aria-label="回到全图">
+        <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+          <path d="M4 9V4h5M20 15v5h-5M20 9V4h-5M4 15v5h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+</main>
+
+<aside class="panel" id="panel" hidden aria-label="车站故事">
+  <button class="panel-close" id="panelClose" type="button" aria-label="关闭">×</button>
+
+  <div class="panel-head">
+    <div class="p-lines" id="pLines"></div>
+    <h2 id="pName">站名</h2>
+    <p class="p-py" id="pPy"></p>
+    <p class="p-tag" id="pTag"></p>
+  </div>
+
+  <div class="panel-body" id="panelBody">
+    <section class="p-block">
+      <h3><span>01</span><b id="pOriginTitle">地名由来</b></h3>
+      <p id="pOrigin"></p>
+    </section>
+
+    <section class="p-block" id="storyBlock">
+      <h3><span>02</span>趣事轶闻</h3>
+      <p id="pStory"></p>
+    </section>
+
+    <div class="pending" id="pending" hidden>
+      <b>这一站的故事还在路上</b>
+      <p>全网 424 站里，已有 87 站写成了完整故事。这一站的详细考据正在补充中。</p>
+      <button type="button" id="showCurated">只看有故事的站</button>
+    </div>
+
+    <div class="nearby" id="nearby" hidden>
+      <h4>附近有故事的站</h4>
+      <div class="nearby-list" id="nearbyList"></div>
+    </div>
+  </div>
+
+  <div class="panel-foot" id="panelFoot">
+    <button type="button" id="prevBtn">← 上一站</button>
+    <span id="pCount"></span>
+    <button type="button" id="nextBtn">下一站 →</button>
+  </div>
+</aside>
+
+<div class="backdrop" id="backdrop" hidden></div>
+
+<div class="tip" id="tip" aria-hidden="true">
+  <b id="tipName"></b>
+  <span id="tipMeta"></span>
+</div>
+
+<script src="data.js"></script>
+<script src="map-data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
